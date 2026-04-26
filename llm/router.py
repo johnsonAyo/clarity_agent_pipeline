@@ -38,7 +38,7 @@ def _cli_is_available() -> bool:
     )
 
 
-def call_llm(system: str, user: str, temperature: float = 0.3) -> tuple[str, str]:
+def call_llm(system: str, user: str, temperature: float = 0.3, think: bool = True) -> tuple[str, str]:
     """
     Routes to the best available model.
 
@@ -51,7 +51,7 @@ def call_llm(system: str, user: str, temperature: float = 0.3) -> tuple[str, str
     # ── Primary: Ollama ───────────────────────────────────────────────────────
     if config.OLLAMA_API_KEY:
         try:
-            text = ollama_provider.run(system, user, temperature=temperature)
+            text = ollama_provider.run(system, user, temperature=temperature, think=think)
             text = _strip_artifacts(text)
             return (f"Ollama {config.OLLAMA_CLOUD_MODEL}", text)
         except Exception as exc:

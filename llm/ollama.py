@@ -25,17 +25,21 @@ def _make_client() -> ollama_sdk.Client:
     )
 
 
-def run(system: str, user: str, temperature: float = 0.3) -> str:
+def run(system: str, user: str, temperature: float = 0.3, think: bool = True) -> str:
     """
     Drives the Ollama agentic loop until the model returns a final response.
     The model autonomously calls web_search / web_fetch as needed.
+
+    think=True for research/analysis tasks. think=False for creative writing — Qwen3.5
+    puts draft content in the thinking block and returns a thin conclusion when think=True,
+    so creative tasks must disable it to get full output.
     """
     client = _make_client()
     messages: list[dict] = [
         {"role": "system", "content": system},
         {"role": "user",   "content": user},
     ]
-    options = {"num_predict": 4096, "temperature": temperature, "num_ctx": 32768}
+    options = {"num_predict": 8192, "temperature": temperature, "num_ctx": 32768}
 
     _MAX_STEPS = 15
 
@@ -45,14 +49,14 @@ def run(system: str, user: str, temperature: float = 0.3) -> str:
         if step > _MAX_STEPS:
             raise RuntimeError(f"Ollama loop exceeded {_MAX_STEPS} steps without completing — aborting")
 
-        log.info("Ollama loop | step=%d/%d | model=%s | messages=%d", step, _MAX_STEPS, config.OLLAMA_CLOUD_MODEL, len(messages))
+        log.info("Ollama loop | step=%d/%d | model=%s | messages=%d | think=%s", step, _MAX_STEPS, config.OLLAMA_CLOUD_MODEL, len(messages), think)
 
         try:
             response = client.chat(
                 model=config.OLLAMA_CLOUD_MODEL,
                 messages=messages,
                 tools=[web_search, web_fetch],
-                think=True,
+                think=think,
                 options=options,
             )
         except Exception as exc:

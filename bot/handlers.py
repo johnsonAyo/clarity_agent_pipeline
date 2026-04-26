@@ -146,16 +146,28 @@ def _generate_and_deliver(update: Update, context: CallbackContext) -> None:
         return
 
     log.info(
-        "Output generation complete | model=%s | image=%s | infographic_prompt_len=%d",
+        "Output generation complete | model=%s | image=%s | tweets=%d | infographic_prompt_len=%d",
         result.model_label,
         result.image_generated,
+        len(result.thread_tweets),
         len(result.infographic_prompt),
     )
 
-    # 1. Posts (short reply + long thread)
-    messenger.send_to_output(f"<b>Posts — {result.model_label}</b>\n\n{result.posts_text}")
+    # 1. Short reply
+    if result.short_reply:
+        messenger.send_to_output(f"<b>Short reply — {result.model_label}</b>\n\n{result.short_reply}")
+    else:
+        log.warning("No short reply extracted from LLM output")
 
-    # 2. Infographic prompt — always sent as text, regardless of image gen outcome
+    # 2. Thread — each tweet as its own message
+    if result.thread_tweets:
+        messenger.send_to_output("<b>Thread</b>")
+        for tweet in result.thread_tweets:
+            messenger.send_to_output(tweet)
+    else:
+        log.warning("No thread tweets extracted from LLM output")
+
+    # 3. Infographic prompt — always sent as text, regardless of image gen outcome
     if result.infographic_prompt:
         messenger.send_to_output(
             "<b>Infographic Prompt:</b>\n\n"
@@ -164,13 +176,11 @@ def _generate_and_deliver(update: Update, context: CallbackContext) -> None:
     else:
         log.warning("No infographic prompt extracted from LLM output")
 
-    # 3. Image — delivered if generated; absence already covered by prompt text above
+    # 4. Image — delivered if generated; prompt text above already covers the no-image case
     if result.image_path:
         sent = messenger.send_photo_to_output(result.image_path)
         if not sent:
             log.warning("Image file exists but Telegram photo send failed | path=%s", result.image_path)
-    else:
-        messenger.send_divider("(Image generation failed or was skipped — use the prompt above manually.)")
 
     update.message.reply_text("🚀 Outputs delivered to Clarity Output bot.")
     context.user_data.clear()

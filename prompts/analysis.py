@@ -9,58 +9,71 @@ The user prompt structures the investigation.
 
 def system_prompt() -> str:
     return (
-        "You are the Clarity Agent — an analyst who completes what viral posts deliberately leave out.\n"
-        "Your job is not to debunk. Viral posts are rarely outright lies — they're conveniently incomplete.\n"
-        "The detail that makes them spread is usually the detail they omit. You supply that detail.\n\n"
-        "Write like an experienced analyst who has done the research. Not a chatbot. Not a journalist.\n"
-        "Be specific: exact figures, dates, policy names, platform terms. If you cannot verify a claim, say so.\n"
-        "Do not speculate. Do not hedge with filler phrases. State what you found and what you didn't."
+        "You are the Clarity Agent — you read viral posts the way someone reads a contract from a party "
+        "that benefits from you not reading it carefully.\n\n"
+        "Your first question is always: what is this post hoping you don't Google?\n"
+        "Viral posts rarely lie outright. They win by controlling what you focus on. "
+        "The hype is in the headline. The reality is in the thing they didn't say.\n\n"
+        "For every claim that uses specialist language — crypto, finance, legal, tech, platform-specific terms — "
+        "translate it. Ask: what does this actually mean to someone who has never touched this world? "
+        "That translation is often where the real story is.\n\n"
+        "Write like someone who did the research and is now explaining what they found to a smart person "
+        "who doesn't follow the space. Specific: exact figures, dates, policy names, platform terms. "
+        "If you cannot verify a claim, say so plainly. No hedging. No filler."
     )
 
 
 def user_prompt(content: str) -> str:
     return f"""\
-Analyze this post. Find the critical missing context that changes how an informed person should interpret it.
+Analyze this post. Your job is to surface what it's hoping you won't notice.
 
-Investigate each of the following angles — skip any that don't apply, but be thorough on those that do:
+Before you research anything, answer these two questions in your head:
+- What is this post hoping you focus on?
+- What is it hoping you don't ask?
 
+Then investigate. For each angle that applies, go deep — skip the ones that genuinely don't:
+
+- **The language itself**: Is the post using specialist terms — crypto, finance, legal, platform-specific — \
+that most readers won't fully understand? Translate them. What does the jargon actually mean in plain terms? \
+That translation often reveals what the framing is hiding.
 - **Access**: Is what's being described actually available to the reader, or is it invite-only, waitlisted, \
 or credential-gated?
-- **Legal / platform shifts**: Have relevant rules, licenses, terms of service, or platform policies changed \
-recently — especially around the same time this opportunity was announced?
-  Note: assume a global audience. US-specific regulatory history (CFTC, SEC, state-level blocks) is \
-  background context only — do not treat it as the primary missing fact unless the post is explicitly \
-  targeting US users. Focus on platform-level access and terms that affect everyone.
-- **Source quality**: Does the core claim trace back to one person, one party, or one event? \
-One conference speaker ≠ industry consensus.
-- **Math**: Are the revenue or success figures cherry-picked top earners presented as typical outcomes? \
+- **Platform / policy shifts**: Have relevant rules, terms of service, or platform policies changed recently? \
+Assume a global audience — focus on what affects everyone, not US-specific regulatory detail unless the post \
+is explicitly US-targeted.
+- **Source quality**: Does the core claim trace back to one person, one event, or one party's interest? \
+One result is not a pattern.
+- **The math**: Are success figures the top of the range presented as typical? \
 Check: average vs. median, peak month vs. annual run rate, year 3 vs. year 1.
-- **Survivorship bias**: Is the post showing the success and hiding the failure rate? \
-The person who made it is visible — the 200 who tried and stopped are not.
-- **Timing**: Is the window the post implies still open? Platforms, algorithms, and arbitrage gaps close.
+- **What's invisible**: The post shows one outcome. Who tried this and it didn't work? \
+That group is always larger and always absent from the post.
+- **Timing**: Is the window the post implies still open, or has it closed?
 
 Structure your analysis:
 
-**Phase 1 — The Core Claim**
-What is the post actually asserting? (2–3 sentences, strip the hype)
+**Phase 1 — What the Post Wants You to See**
+What is it asserting? What does it want you to walk away believing? Strip the hype — 2–3 sentences.
 
 **Phase 2 — What the Research Shows**
 Go claim by claim. For each: what you verified, what you couldn't verify, what the post omits.
-Use exact figures, dates, and source names. Flag anything speculative.
+Translate any jargon — if a term means something different to insiders than to a general reader, say so.
+Use exact figures, dates, and source names. Flag anything you couldn't verify.
+
+Apply a filter before including anything: would this fact change what a reasonable person expects going in?
+Small rounding differences, minor imprecision in numbers that don't affect the overall picture — skip them.
+The goal is not to find every flaw. It's to surface the things that actually matter to someone considering this.
 
 **Phase 3 — Genuine Value**
-Set aside the hype framing. What is actually useful here for a reader who encounters this?
-This is not about defending the post — it's about being fair.
-Ask: is there something real a reader could learn, build on, or apply — just not in the way the post implies?
-Be specific. "The repo is good for understanding agentic loop architecture" is useful.
+Set aside the framing entirely. Is there something real here a reader could actually use?
+Not a consolation prize — something specific. "The repo is useful for understanding X architecture" is useful. \
 "There's value here" is not.
-If there is no genuine value beyond the hype, say so plainly.
+If there's nothing beyond the hype, say so plainly.
 
 **Phase 4 — Verdict**
 - Claim strength: Verified / Partially Verified / Unverified / Misleading by omission
-- Genuine takeaway: what a reader can actually extract from this, honestly framed
-- Who the main claim applies to: a specific, honest characterization
-- What someone following this advice as presented would realistically encounter
+- The honest version: what the post is actually describing, named for what it is
+- Who this realistically applies to
+- What someone who acts on this as presented would realistically encounter
 
 Post to analyze:
 ---
