@@ -49,6 +49,14 @@ OLLAMA_MAX_TOOL_RESULT_CHARS = 8_000
 # ── Skills ─────────────────────────────────────────────────────────────────────
 CLARITY_SKILL_PATH = BASE_DIR / "skills" / "clarity-bot" / "SKILL.md"
 
+# ── Image generation — Hugging Face (primary, free) ───────────────────────────
+HF_API_TOKEN      = _optional("HF_API_TOKEN")
+HF_IMAGE_MODEL    = _optional("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-schnell")
+
+# ── Image generation — OpenAI (fallback, paid) ────────────────────────────────
+OPENAI_API_KEY     = _optional("OPENAI_API_KEY")
+OPENAI_IMAGE_MODEL = _optional("OPENAI_IMAGE_MODEL", "gpt-image-1")
+
 # ── Output paths ──────────────────────────────────────────────────────────────
 IMAGE_OUTPUT_PATH = Path("/tmp/clarity_infographic.png")
 LOG_PATH          = BASE_DIR / "bot.log"
