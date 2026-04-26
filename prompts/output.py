@@ -74,28 +74,40 @@ No sign-off. No character count. Just the tweet.
 ─────────────────────────────────────────────
 
 Deliverable 2 — Thread
-Write a thread of however many tweets it actually takes — no minimum, no maximum.
+3 to 5 tweets. Not more.
 
-The bar for including a fact: would this change what a reasonable person expects going in?
-If a number is slightly off but the overall picture is still accurate, skip it — that's nitpicking, not clarity.
-Only include things that genuinely shift the picture.
+Pick the 2 strongest facts from the analysis — the ones that would actually stop someone and make them reconsider. Ignore everything else. Covering 8 angles means none of them land.
 
-First tweet: the hook — one sentence that makes someone want to read the rest.
-Middle tweets: one real thing per tweet that the reader needs to know before they try this.
-  If something uses jargon, translate it — "Think of this as..." if that's what it takes.
-  Vary the length. Some short. Some longer.
-Second-to-last tweet: what someone can actually get from this, honestly framed.
-Last tweet: who this realistically applies to, on what terms. Plain. Not a takedown.
+The bar for including a fact: would this make a reasonable person pause before doing this?
+If a tweet requires you to explain background mechanics so the reader can understand why it matters — cut it. It shouldn't be in the thread.
+If it's technically true but doesn't change the overall picture — cut it.
 
-No numbering. No [1/7] format. Just write the tweets separated by blank lines, the way someone would actually post them.
+First tweet: the thing that reframes the whole post. One sentence.
+Middle tweets (1–2 max): the facts that matter, stated plainly. No mechanics. No disclaimers.
+  If something uses jargon, translate it in one sentence — "Think of this as..." if needed.
+Last tweet: what this actually is, and who it realistically applies to. Plain. Not a lecture.
+
+Separate tweets with a blank line. No numbering.
 
 ─────────────────────────────────────────────
 
 Deliverable 3 — Infographic Prompt
-A precise visual brief for an AI image generator.
-Portrait format, 1080x1350px, clean and readable at a glance.
-Show the key contrast: what the post implies vs. what the research confirms.
-Max 4 data points — the strongest, most verifiable ones only.
-Specify: layout type, color palette, typography style, any visual elements.
-No vague descriptions. Make it specific enough that two different designers would produce the same layout.
-Do not say "image of" or "photo of" — describe the design directly."""
+Write a prompt for an AI image generator. Use this exact structure — fill in the content from the analysis:
+
+Visual concept: Split-screen comparison chart titled "[short title that names what this post is actually about]"
+
+Left side (What You're Told):
+- [claim 1 from the post, in the post's own language — short]
+- [claim 2]
+- [claim 3]
+- [claim 4 max]
+
+Right side (What The Data Shows):
+- [what research found for claim 1 — specific, plain]
+- [what research found for claim 2]
+- [what research found for claim 3]
+- [what research found for claim 4]
+
+Bottom banner: "[one plain sentence — the honest version of what this is and who it applies to]"
+
+Style: Clean, minimal. Black and white with one accent color (orange). No stock photos. No gradients. Simple flat icons next to each line. Looks like a founder sharing notes, not a marketing deck. Portrait format, 1080x1350px."""

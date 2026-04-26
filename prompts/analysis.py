@@ -59,9 +59,9 @@ Go claim by claim. For each: what you verified, what you couldn't verify, what t
 Translate any jargon — if a term means something different to insiders than to a general reader, say so.
 Use exact figures, dates, and source names. Flag anything you couldn't verify.
 
-Apply a filter before including anything: would this fact change what a reasonable person expects going in?
-Small rounding differences, minor imprecision in numbers that don't affect the overall picture — skip them.
-The goal is not to find every flaw. It's to surface the things that actually matter to someone considering this.
+Apply a strict filter before including anything: would this fact change what a reasonable person decides or expects going in?
+Small rounding differences, minor imprecision, background mechanics that require explanation — skip them.
+The goal is not to find every flaw. Find the 2 or 3 things that actually change the picture. That's it.
 
 **Phase 3 — Genuine Value**
 Set aside the framing entirely. Is there something real here a reader could actually use?
