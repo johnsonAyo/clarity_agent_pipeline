@@ -65,15 +65,17 @@ Analysis:
 
 ─────────────────────────────────────────────
 
-Deliverable 1 — Short Reply (1 tweet, hard maximum 240 characters)
+Write three outputs. Wrap each one in the XML tags shown.
+
+<short_reply>
+1 tweet, hard maximum 240 characters.
 The thing they left out, said plainly. Not a summary — the one fact that changes how you read the post.
 Write it the way someone would say it, not the way it would appear in a report.
 Use approximations people actually say — "over 3%", "almost four months", not "~3.15%" or "3.5 months".
-No sign-off. No character count. Just the tweet.
+No sign-off.
+</short_reply>
 
-─────────────────────────────────────────────
-
-Deliverable 2 — Thread
+<thread>
 3 to 5 tweets. Not more.
 
 Pick the 2 strongest facts from the analysis — the ones that would actually stop someone and make them reconsider. Ignore everything else. Covering 8 angles means none of them land.
@@ -88,10 +90,9 @@ Middle tweets (1–2 max): the facts that matter, stated plainly. No mechanics. 
 Last tweet: what this actually is, and who it realistically applies to. Plain. Not a lecture.
 
 Separate tweets with a blank line. No numbering.
+</thread>
 
-─────────────────────────────────────────────
-
-Deliverable 3 — Infographic Prompt
+<infographic_prompt>
 Write a prompt for an AI image generator. Use this exact structure — fill in the content from the analysis:
 
 Visual concept: Split-screen comparison chart titled "[short title that names what this post is actually about]"
@@ -110,4 +111,5 @@ Right side (What The Data Shows):
 
 Bottom banner: "[one plain sentence — the honest version of what this is and who it applies to]"
 
-Style: Clean, minimal. Black and white with one accent color (orange). No stock photos. No gradients. Simple flat icons next to each line. Looks like a founder sharing notes, not a marketing deck. Portrait format, 1080x1350px."""
+Style: Clean, minimal. Black and white with one accent color (orange). No stock photos. No gradients. Simple flat icons next to each line. Looks like a founder sharing notes, not a marketing deck. Portrait format, 1080x1350px.
+</infographic_prompt>"""

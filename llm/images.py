@@ -3,7 +3,7 @@ llm/images.py
 =============
 Infographic image generation — two-tier pipeline:
 
-  1. Hugging Face Inference API — FLUX.1-schnell (free tier, excellent quality)
+  1. Hugging Face — FLUX.1-schnell via InferenceClient (free tier, excellent quality)
   2. OpenAI — gpt-image-1 or dall-e-3 (paid fallback)
 
 Always best-effort. Returns (path, reason) so callers can log the exact outcome.
@@ -14,8 +14,6 @@ from __future__ import annotations
 import base64
 import logging
 from pathlib import Path
-
-import requests
 
 import config
 
@@ -51,33 +49,23 @@ def generate_image(prompt: str) -> tuple[Path | None, str]:
 # ── Tier 1: Hugging Face ─────────────────────────────────────────────────────
 
 def _generate_via_huggingface(prompt: str) -> tuple[Path | None, str]:
-    url = f"https://api-inference.huggingface.co/models/{config.HF_IMAGE_MODEL}"
-    headers = {"Authorization": f"Bearer {config.HF_API_TOKEN}"}
+    try:
+        from huggingface_hub import InferenceClient
+    except ImportError:
+        return None, "huggingface_hub not installed — run: pip install huggingface_hub"
+
+    client = InferenceClient(token=config.HF_API_TOKEN)
 
     try:
-        response = requests.post(
-            url,
-            headers=headers,
-            json={"inputs": prompt},
-            timeout=120,
-        )
+        image = client.text_to_image(prompt, model=config.HF_IMAGE_MODEL)
     except Exception as exc:
-        return None, f"HuggingFace request failed: {exc}"
-
-    if response.status_code == 503:
-        return None, "HuggingFace model is loading — retry in 20 seconds"
-    if response.status_code != 200:
-        return None, f"HuggingFace API error {response.status_code}: {response.text[:200]}"
-
-    content_type = response.headers.get("content-type", "")
-    if "image" not in content_type:
-        return None, f"HuggingFace returned non-image content-type: {content_type}"
+        return None, f"HuggingFace inference failed: {exc}"
 
     try:
-        config.IMAGE_OUTPUT_PATH.write_bytes(response.content)
-        log.info("HuggingFace image saved | path=%s | bytes=%d", config.IMAGE_OUTPUT_PATH, len(response.content))
+        image.save(str(config.IMAGE_OUTPUT_PATH))
+        log.info("HuggingFace image saved | path=%s", config.IMAGE_OUTPUT_PATH)
         return config.IMAGE_OUTPUT_PATH, "ok"
-    except OSError as exc:
+    except Exception as exc:
         return None, f"File write failed: {exc}"
 
 
@@ -93,13 +81,14 @@ def _generate_via_openai(prompt: str) -> tuple[Path | None, str]:
 
     is_dalle = "dall-e" in config.OPENAI_IMAGE_MODEL
     size = "1024x1792" if is_dalle else "1024x1536"
+    quality = "standard" if is_dalle else "medium"
 
     try:
         response = client.images.generate(
             model=config.OPENAI_IMAGE_MODEL,
             prompt=prompt,
             size=size,
-            quality="standard",
+            quality=quality,
             n=1,
         )
     except Exception as exc:
@@ -119,5 +108,3 @@ def _generate_via_openai(prompt: str) -> tuple[Path | None, str]:
         return config.IMAGE_OUTPUT_PATH, "ok"
     except OSError as exc:
         return None, f"File write failed: {exc}"
-
-

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 import telemetry
@@ -21,11 +21,9 @@ from prompts.output import system_prompt, user_prompt
 
 log = logging.getLogger(__name__)
 
-_INFOGRAPHIC_HEADER = "Deliverable 3 — Infographic Prompt"
-
-_D1_RE = re.compile(r"Deliverable\s+1\s*[—–-][^\n]*\n?", re.IGNORECASE)
-_D2_RE = re.compile(r"Deliverable\s+2\s*[—–-][^\n]*\n?", re.IGNORECASE)
-_D3_RE = re.compile(re.escape(_INFOGRAPHIC_HEADER), re.IGNORECASE)
+def _extract_tag(raw: str, tag: str) -> str:
+    m = re.search(rf"<{tag}>(.*?)</{tag}>", raw, re.DOTALL | re.IGNORECASE)
+    return m.group(1).strip() if m else ""
 
 
 @dataclass
@@ -40,41 +38,31 @@ class OutputResult:
 
 def _parse_output(raw: str) -> tuple[str, list[str], str]:
     """
-    Splits raw LLM output into (short_reply, thread_tweets, infographic_prompt).
-
-    Uses the Deliverable headers as anchors. Falls back gracefully if the model
-    omits headers — content is still delivered, just unsplit.
+    Extracts (short_reply, thread_tweets, infographic_prompt) from XML-tagged LLM output.
+    Falls back to full body as short_reply if tags are missing.
     """
-    # Strip infographic section first
-    d3 = _D3_RE.search(raw)
-    infographic = raw[d3.end():].strip() if d3 else ""
-    body = raw[:d3.start()].strip() if d3 else raw.strip()
+    short_reply = _extract_tag(raw, "short_reply")
+    thread_raw = _extract_tag(raw, "thread")
+    infographic = _extract_tag(raw, "infographic_prompt")
+
+    if not short_reply:
+        log.warning("short_reply tag not found — delivering full body as short reply")
+        short_reply = raw.strip()
+
+    if not thread_raw:
+        log.warning("thread tag not found — no tweets extracted")
 
     if not infographic:
-        log.warning("Infographic header not found — prompt will be empty")
+        log.warning("infographic_prompt tag not found — prompt will be empty")
 
-    # Find Deliverable 1 and 2 markers within body
-    d1 = _D1_RE.search(body)
-    d2 = _D2_RE.search(body)
-
-    if d1 and d2 and d1.start() < d2.start():
-        short_reply = body[d1.end():d2.start()].strip()
-        thread_raw = body[d2.end():].strip()
-    elif d2:
-        short_reply = body[:d2.start()].strip()
-        thread_raw = body[d2.end():].strip()
-    else:
-        log.warning("Post structure headers not found — delivering full body as short reply")
-        return body, [], infographic
-
-    tweets = [t.strip() for t in re.split(r"\n{2,}", thread_raw) if t.strip()]
+    tweets = [t.strip() for t in re.split(r"\n{2,}", thread_raw) if t.strip()] if thread_raw else []
 
     log.info(
         "Output parsed | short_reply_len=%d | tweets=%d | infographic_len=%d",
         len(short_reply), len(tweets), len(infographic),
     )
 
-    if len(short_reply) < 10:
+    if short_reply and len(short_reply) < 10:
         log.warning("Short reply suspiciously short (%d chars) | preview: %s", len(short_reply), raw[:300])
 
     return short_reply, tweets, infographic
