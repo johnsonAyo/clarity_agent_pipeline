@@ -1,22 +1,22 @@
 # Skills manifest — controls which /commands appear in Telegram.
 #
-# enabled: false  →  skill is hidden from Telegram (SKILL.md renamed to .off on Oracle)
-# enabled: true   →  skill is active
+# enabled: false  →  skill folder renamed to <name>.off on Oracle (hidden from Hermes)
+# enabled: true   →  skill folder is active
 #
-# Skills marked with a comment "# repo" have their SKILL.md in this repo under skills/<name>/
-# All other skills have their SKILL.md managed privately via ~/skills/ on Mac.
+# Skills marked "# repo" have their SKILL.md in this repo under skills/<name>/
+# All other skills have their content managed privately or by Hermes built-ins.
 #
 # Push this file to enable/disable skills. No SSH required.
 
 skills:
-  # ── Custom skills (SKILL.md lives in this repo) ──────────────────────────
+  # ── Custom skills (SKILL.md in this repo) ────────────────────────────────
   - name: clarity-pipeline
     enabled: true        # repo
 
   - name: skill-manager
     enabled: true        # repo
 
-  # ── Private skills (SKILL.md in ~/skills/, not on GitHub) ────────────────
+  # ── Private custom skills (~/skills/ on Mac, not on GitHub) ──────────────
   - name: validate-post
     enabled: true
 
@@ -111,4 +111,83 @@ skills:
     enabled: true
 
   - name: lessons
+    enabled: true
+
+  # ── Built-in Hermes skills (~/.hermes/skills/) ────────────────────────────
+  - name: brain-ops
+    enabled: true
+
+  - name: diagramming
+    enabled: false
+
+  - name: software-development
+    enabled: true
+
+  - name: devops
+    enabled: true
+
+  - name: research
+    enabled: true
+
+  - name: data-science
+    enabled: true
+
+  - name: social-media
+    enabled: true
+
+  - name: creative
+    enabled: true
+
+  - name: productivity
+    enabled: true
+
+  - name: note-taking
+    enabled: true
+
+  - name: email
+    enabled: true
+
+  - name: github
+    enabled: true
+
+  - name: red-teaming
+    enabled: true
+
+  - name: domain
+    enabled: true
+
+  - name: media
+    enabled: true
+
+  - name: gaming
+    enabled: true
+
+  - name: gifs
+    enabled: true
+
+  - name: apple
+    enabled: true
+
+  - name: smart-home
+    enabled: true
+
+  - name: mcp
+    enabled: true
+
+  - name: mlops
+    enabled: true
+
+  - name: autonomous-ai-agents
+    enabled: true
+
+  - name: inference-sh
+    enabled: true
+
+  - name: yuanbao
+    enabled: true
+
+  - name: dogfood
+    enabled: true
+
+  - name: conventions
     enabled: true

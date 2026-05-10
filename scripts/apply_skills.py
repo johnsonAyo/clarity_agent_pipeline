@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """
-apply_skills.py — applies skills.yaml manifest to ~/clarity-skills/ on Oracle.
+apply_skills.py — applies skills.yaml manifest to all Hermes skill directories.
 
-For each skill in the manifest:
-  enabled: true  → ensures SKILL.md is active (restores from .off if needed)
-  enabled: false → renames SKILL.md to SKILL.md.off (non-destructive disable)
+Searches two locations for each skill:
+  1. ~/clarity-skills/   (custom skills synced from Mac)
+  2. ~/.hermes/skills/   (built-in Hermes skills)
 
-For skills whose SKILL.md lives in this repo (under skills/<name>/):
-  copies the file into ~/clarity-skills/<name>/ before applying enable/disable state.
+enable/disable mechanism: renames the entire skill folder to <name>.off
+This is format-agnostic — works whether the skill uses SKILL.md, DESCRIPTION.md, etc.
+
+For skills whose SKILL.md lives in this repo (skills/<name>/SKILL.md):
+  deploys the file into ~/clarity-skills/<name>/ before applying state.
 """
 
 import shutil
@@ -21,8 +24,23 @@ except ImportError:
     sys.exit(1)
 
 REPO_ROOT = Path(__file__).parent.parent
-SKILLS_DIR = Path.home() / "clarity-skills"
 MANIFEST = REPO_ROOT / "skills.yaml"
+
+SEARCH_DIRS = [
+    Path.home() / "clarity-skills",
+    Path.home() / ".hermes" / "skills",
+]
+
+
+def find_skill(name: str) -> tuple[Path | None, Path | None]:
+    """Returns (active_path, disabled_path) — either or both may be None."""
+    for base in SEARCH_DIRS:
+        active = base / name
+        disabled = base / f"{name}.off"
+        if active.exists() or disabled.exists():
+            return (active if active.exists() else None,
+                    disabled if disabled.exists() else None)
+    return None, None
 
 
 def main() -> None:
@@ -32,43 +50,40 @@ def main() -> None:
 
     config = yaml.safe_load(MANIFEST.read_text())
     skills = config.get("skills", [])
-    print(f"Applying manifest: {len(skills)} skills")
+    print(f"Applying manifest: {len(skills)} skills\n")
 
     for skill in skills:
         name = skill["name"]
         enabled = skill.get("enabled", True)
-        skill_dir = SKILLS_DIR / name
 
-        # Deploy SKILL.md from repo if it exists here
+        # Deploy SKILL.md from repo if present (always into clarity-skills)
         repo_skill_md = REPO_ROOT / "skills" / name / "SKILL.md"
         if repo_skill_md.exists():
-            skill_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(repo_skill_md, skill_dir / "SKILL.md")
-            print(f"  [repo] deployed: {name}")
+            dest_dir = Path.home() / "clarity-skills" / name
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(repo_skill_md, dest_dir / "SKILL.md")
+            print(f"  [repo]  deployed:  {name}")
 
-        if not skill_dir.exists():
-            print(f"  [skip] not found in clarity-skills: {name}")
+        active_path, disabled_path = find_skill(name)
+
+        if active_path is None and disabled_path is None:
+            print(f"  [skip]  not found: {name}")
             continue
 
-        skill_md = skill_dir / "SKILL.md"
-        skill_md_off = skill_dir / "SKILL.md.off"
-
         if enabled:
-            if skill_md_off.exists() and not skill_md.exists():
-                skill_md_off.rename(skill_md)
-                print(f"  [on]  enabled:  {name}")
+            if disabled_path and not active_path:
+                disabled_path.rename(disabled_path.parent / name)
+                print(f"  [on]    enabled:   {name}")
             else:
-                print(f"  [ok]  active:   {name}")
+                print(f"  [ok]    active:    {name}")
         else:
-            if skill_md.exists():
-                skill_md.rename(skill_md_off)
-                print(f"  [off] disabled: {name}")
-            elif skill_md_off.exists():
-                print(f"  [ok]  already disabled: {name}")
+            if active_path:
+                active_path.rename(active_path.parent / f"{name}.off")
+                print(f"  [off]   disabled:  {name}")
             else:
-                print(f"  [skip] no SKILL.md found: {name}")
+                print(f"  [ok]    already disabled: {name}")
 
-    print("Done.")
+    print("\nDone.")
 
 
 if __name__ == "__main__":
