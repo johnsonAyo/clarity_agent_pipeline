@@ -1,0 +1,114 @@
+# Skills manifest — controls which /commands appear in Telegram.
+#
+# enabled: false  →  skill is hidden from Telegram (SKILL.md renamed to .off on Oracle)
+# enabled: true   →  skill is active
+#
+# Skills marked with a comment "# repo" have their SKILL.md in this repo under skills/<name>/
+# All other skills have their SKILL.md managed privately via ~/skills/ on Mac.
+#
+# Push this file to enable/disable skills. No SSH required.
+
+skills:
+  # ── Custom skills (SKILL.md lives in this repo) ──────────────────────────
+  - name: clarity-pipeline
+    enabled: true        # repo
+
+  - name: skill-manager
+    enabled: true        # repo
+
+  # ── Private skills (SKILL.md in ~/skills/, not on GitHub) ────────────────
+  - name: validate-post
+    enabled: true
+
+  - name: security-audit
+    enabled: true
+
+  - name: job-application
+    enabled: true
+
+  - name: tdd
+    enabled: true
+
+  - name: architecture
+    enabled: true
+
+  - name: patterns
+    enabled: true
+
+  - name: stack
+    enabled: true
+
+  - name: tooling
+    enabled: true
+
+  - name: domain-model
+    enabled: true
+
+  - name: zoom-out
+    enabled: true
+
+  - name: grill-me
+    enabled: true
+
+  - name: github-triage
+    enabled: true
+
+  - name: to-issues
+    enabled: true
+
+  - name: to-prd
+    enabled: true
+
+  - name: write-a-skill
+    enabled: true
+
+  - name: qa
+    enabled: true
+
+  - name: edit-article
+    enabled: true
+
+  - name: scaffold-exercises
+    enabled: true
+
+  - name: request-refactor-plan
+    enabled: true
+
+  - name: improve-codebase-architecture
+    enabled: true
+
+  - name: migrate-to-shoehorn
+    enabled: true
+
+  - name: ubiquitous-language
+    enabled: true
+
+  - name: setup-pre-commit
+    enabled: true
+
+  - name: git-guardrails-claude-code
+    enabled: true
+
+  - name: design-an-interface
+    enabled: true
+
+  - name: triage-issue
+    enabled: true
+
+  - name: obsidian-vault
+    enabled: true
+
+  - name: caveman
+    enabled: true
+
+  - name: or-free
+    enabled: true
+
+  - name: or-model
+    enabled: true
+
+  - name: templates
+    enabled: true
+
+  - name: lessons
+    enabled: true

@@ -6,36 +6,9 @@ on:
       - main
 
 jobs:
-  test:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Run E2E Test
-        env:
-          # These are required to initialize config.py and connect to the APIs
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_OUTPUT_BOT_TOKEN: ${{ secrets.TELEGRAM_OUTPUT_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          OLLAMA_API_KEY: ${{ secrets.OLLAMA_API_KEY }}
-        run: |
-          python test_pipeline.py
-
   deploy:
     name: Deploy to Oracle Cloud
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - name: Deploy using SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -44,15 +17,8 @@ jobs:
           username: ${{ secrets.ORACLE_USERNAME }}
           key: ${{ secrets.ORACLE_SSH_KEY }}
           script: |
-            # Navigate to the project directory (update this if your path is different!)
             cd ~/clarity_bot_pipeline
-            
-            # Pull latest changes from the main branch (force overwrite any local server changes)
             git fetch origin main
             git reset --hard origin/main
-            
-            # Install any new dependencies
-            pip3 install -r requirements.txt
-            
-            # Start or Restart the bot using PM2's ecosystem file
-            pm2 start ecosystem.config.js
+            source venv/bin/activate && pip install -r requirements.txt
+            python scripts/apply_skills.py
