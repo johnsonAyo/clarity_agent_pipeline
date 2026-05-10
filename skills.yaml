@@ -160,7 +160,7 @@ skills:
     enabled: true
 
   - name: gaming
-    enabled: true
+    enabled: false
 
   - name: gifs
     enabled: true
