@@ -22,3 +22,4 @@ jobs:
             git reset --hard origin/main
             source venv/bin/activate && pip install -r requirements.txt
             python scripts/apply_skills.py
+            source ~/.hermes/hermes-agent/venv/bin/activate && python -m hermes_cli.main gateway restart --wait 2>/dev/null || true
