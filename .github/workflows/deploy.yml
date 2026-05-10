@@ -47,11 +47,12 @@ jobs:
             # Navigate to the project directory (update this if your path is different!)
             cd ~/clarity_bot_pipeline
             
-            # Pull latest changes from the main branch
-            git pull origin main
+            # Pull latest changes from the main branch (force overwrite any local server changes)
+            git fetch origin main
+            git reset --hard origin/main
             
             # Install any new dependencies
             pip3 install -r requirements.txt
             
-            # Restart the bot using PM2
-            pm2 restart clarity-bot
+            # Start or Restart the bot using PM2's ecosystem file
+            pm2 start ecosystem.config.js
