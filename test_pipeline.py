@@ -36,7 +36,8 @@ def test_full_flow():
         
         # 2. Test the Telegram delivery logic
         print("\n Testing Telegram delivery logic...")
-        send_output(analysis)
+        from bot import messenger
+        messenger.send_to_output(result)
         print(" Analysis sent to Telegram! Check your Output Bot.")
         
     except Exception as e:

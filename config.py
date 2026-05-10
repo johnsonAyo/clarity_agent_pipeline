@@ -29,34 +29,34 @@ def _optional(key: str, default: str = "") -> str:
     return os.getenv(key, default)
 
 
-# ── Telegram ──────────────────────────────────────────────────────────────────
+# Telegram
 TELEGRAM_INPUT_TOKEN  = _require("TELEGRAM_BOT_TOKEN")
 TELEGRAM_OUTPUT_TOKEN = _require("TELEGRAM_OUTPUT_BOT_TOKEN")
 TELEGRAM_CHAT_ID      = _require("TELEGRAM_CHAT_ID")
 
-# ── Claude CLI (primary analyst) ──────────────────────────────────────────────
+# Claude CLI (primary analyst)
 _cli_path_env    = _optional("CLAUDE_CLI_PATH", "claude")
 CLAUDE_CLI_PATH  = shutil.which(_cli_path_env) or _cli_path_env
 CLAUDE_CLI_MODEL = _optional("CLAUDE_CLI_MODEL", "claude-opus-4-7")
 CLAUDE_CLI_TIMEOUT = int(_optional("CLAUDE_CLI_TIMEOUT", "300"))
 
-# ── Ollama cloud (fallback + image generation) ────────────────────────────────
+# Ollama Cloud (primary provider — free tier supports light usage, resets every 5h)
 OLLAMA_API_KEY     = _optional("OLLAMA_API_KEY")
-OLLAMA_CLOUD_MODEL = _optional("OLLAMA_CLOUD_MODEL", "qwen3.5:397b")
-OLLAMA_IMAGE_MODEL = _optional("OLLAMA_IMAGE_MODEL", "qwen3-vl:235b")  # Note: VL = vision-language (reads images, does not generate them)
+OLLAMA_CLOUD_MODEL = _optional("OLLAMA_CLOUD_MODEL", "qwen3.5:35b")    # analysis + output
+OLLAMA_IMAGE_MODEL = _optional("OLLAMA_IMAGE_MODEL", "qwen3.5-vl:7b") # vision (not generation)
 OLLAMA_MAX_TOOL_RESULT_CHARS = 8_000
 
-# ── Skills ─────────────────────────────────────────────────────────────────────
+# Skills
 CLARITY_SKILL_PATH = BASE_DIR / "skills" / "clarity-bot" / "SKILL.md"
 
-# ── Image generation — Hugging Face (primary, free) ───────────────────────────
+# Image generation - Hugging Face (primary, free)
 HF_API_TOKEN      = _optional("HF_API_TOKEN")
 HF_IMAGE_MODEL    = _optional("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-schnell")
 
-# ── Image generation — OpenAI (fallback, paid) ────────────────────────────────
+# Image generation - OpenAI (fallback, paid)
 OPENAI_API_KEY     = _optional("OPENAI_API_KEY")
 OPENAI_IMAGE_MODEL = _optional("OPENAI_IMAGE_MODEL", "gpt-image-1")
 
-# ── Output paths ──────────────────────────────────────────────────────────────
+# Output paths
 IMAGE_OUTPUT_PATH = Path("/tmp/clarity_infographic.png")
 LOG_PATH          = BASE_DIR / "bot.log"

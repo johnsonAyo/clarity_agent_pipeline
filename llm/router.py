@@ -48,7 +48,7 @@ def call_llm(system: str, user: str, temperature: float = 0.3, think: bool = Tru
     Raises:
         RuntimeError if all providers fail.
     """
-    # ── Primary: Ollama ───────────────────────────────────────────────────────
+    # Primary: Ollama
     if config.OLLAMA_API_KEY:
         try:
             text = ollama_provider.run(system, user, temperature=temperature, think=think)
@@ -59,7 +59,7 @@ def call_llm(system: str, user: str, temperature: float = 0.3, think: bool = Tru
     else:
         log.warning("OLLAMA_API_KEY not set — skipping Ollama, trying Claude CLI")
 
-    # ── Fallback: Claude CLI ───────────────────────────────────────────────────
+    # Fallback: Claude CLI
     if not _cli_is_available():
         raise RuntimeError(
             "Ollama unavailable and Claude CLI not found. "

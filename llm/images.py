@@ -1,10 +1,10 @@
 """
 llm/images.py
 =============
-Infographic image generation — two-tier pipeline:
+Infographic image generation - two-tier pipeline:
 
-  1. Hugging Face — FLUX.1-schnell via InferenceClient (free tier, excellent quality)
-  2. OpenAI — gpt-image-1 or dall-e-3 (paid fallback)
+  1. Hugging Face - FLUX.1-schnell via InferenceClient (free tier, excellent quality)
+  2. OpenAI - gpt-image-1 or dall-e-3 (paid fallback)
 
 Always best-effort. Returns (path, reason) so callers can log the exact outcome.
 """
@@ -20,10 +20,10 @@ import config
 log = logging.getLogger(__name__)
 
 
-# ── Public interface ──────────────────────────────────────────────────────────
+# Public interface
 
 def generate_image(prompt: str) -> tuple[Path | None, str]:
-    # ── Tier 1: Hugging Face (free) ───────────────────────────────────────────
+    # Tier 1: Hugging Face (free)
     if config.HF_API_TOKEN:
         log.info("Image gen tier 1 | provider=HuggingFace | model=%s", config.HF_IMAGE_MODEL)
         path, reason = _generate_via_huggingface(prompt)
@@ -33,7 +33,7 @@ def generate_image(prompt: str) -> tuple[Path | None, str]:
     else:
         log.info("HuggingFace skipped | HF_API_TOKEN not set | trying OpenAI")
 
-    # ── Tier 2: OpenAI (paid) ─────────────────────────────────────────────────
+    # Tier 2: OpenAI (paid)
     if config.OPENAI_API_KEY:
         log.info("Image gen tier 2 | provider=OpenAI | model=%s", config.OPENAI_IMAGE_MODEL)
         path, reason = _generate_via_openai(prompt)
@@ -46,13 +46,13 @@ def generate_image(prompt: str) -> tuple[Path | None, str]:
     return None, "All image providers failed"
 
 
-# ── Tier 1: Hugging Face ─────────────────────────────────────────────────────
+# Tier 1: Hugging Face
 
 def _generate_via_huggingface(prompt: str) -> tuple[Path | None, str]:
     try:
         from huggingface_hub import InferenceClient
     except ImportError:
-        return None, "huggingface_hub not installed — run: pip install huggingface_hub"
+        return None, "huggingface_hub not installed - run: pip install huggingface_hub"
 
     client = InferenceClient(token=config.HF_API_TOKEN)
 
@@ -69,13 +69,13 @@ def _generate_via_huggingface(prompt: str) -> tuple[Path | None, str]:
         return None, f"File write failed: {exc}"
 
 
-# ── Tier 2: OpenAI ────────────────────────────────────────────────────────────
+# Tier 2: OpenAI
 
 def _generate_via_openai(prompt: str) -> tuple[Path | None, str]:
     try:
         from openai import OpenAI
     except ImportError:
-        return None, "openai package not installed — run: pip install openai"
+        return None, "openai package not installed - run: pip install openai"
 
     client = OpenAI(api_key=config.OPENAI_API_KEY)
 

@@ -90,7 +90,7 @@ def _send_text(bot: Bot | None, chat_id: str | None, text: str, reply_fn=None) -
                 log.critical("Plaintext send also failed | error=%s", exc2)
 
 
-# ── Public API ────────────────────────────────────────────────────────────────
+# Public API
 
 def reply(message, text: str) -> None:
     """Reply to a user message via the input bot."""

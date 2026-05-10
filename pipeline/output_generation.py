@@ -9,17 +9,77 @@ image generation succeeds. Image generation is best-effort.
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import re
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 import telemetry
+from brain import gbrain_cli
 from llm.images import generate_image
 from llm.router import call_llm
 from prompts.output import system_prompt, user_prompt
 
 log = logging.getLogger(__name__)
+
+
+def _writeback_slug(content: str) -> str:
+    """Stable slug from content hash, prefixed with the UTC date for chronological listing."""
+    digest = hashlib.sha1(content.strip().encode("utf-8")).hexdigest()[:8]
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    return f"clarity/analyses/{today}-{digest}"
+
+
+def _writeback_body(
+    content: str,
+    analysis: str,
+    short_reply: str,
+    thread_tweets: list[str],
+    infographic_prompt: str,
+) -> str:
+    thread_block = "\n\n".join(thread_tweets) if thread_tweets else "(none)"
+    return (
+        "## Original Post\n\n"
+        f"{content.strip()}\n\n"
+        "## Analysis\n\n"
+        f"{analysis.strip()}\n\n"
+        "## Short Reply\n\n"
+        f"{short_reply.strip() or '(none)'}\n\n"
+        "## Thread\n\n"
+        f"{thread_block}\n\n"
+        "## Infographic Prompt\n\n"
+        f"{infographic_prompt.strip() or '(none)'}\n"
+    )
+
+
+def _persist_to_brain(
+    content: str,
+    analysis: str,
+    short_reply: str,
+    thread_tweets: list[str],
+    infographic_prompt: str,
+    model_label: str,
+) -> None:
+    """
+    Best-effort write-back so future analyses retrieve this one as prior context.
+    Never raises — the post has already been delivered to the user; this is a
+    background indexing step.
+    """
+    try:
+        slug = _writeback_slug(content)
+        frontmatter = {
+            "type": "clarity-analysis",
+            "model": model_label,
+            "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "content_preview": content.strip().replace("\n", " ")[:140],
+        }
+        body = _writeback_body(content, analysis, short_reply, thread_tweets, infographic_prompt)
+        gbrain_cli.save_page(slug, frontmatter, body)
+        log.info("Write-back ok | slug=%s", slug)
+    except Exception as exc:
+        log.warning("Write-back failed | %s", exc)
 
 def _extract_tag(raw: str, tag: str) -> str:
     m = re.search(rf"<{tag}>(.*?)</{tag}>", raw, re.DOTALL | re.IGNORECASE)
@@ -98,6 +158,15 @@ def run(content: str, analysis: str) -> OutputResult:
             log.info("Image generation succeeded | path=%s", image_path)
         else:
             log.warning("Image generation failed | reason=%s", image_reason)
+
+    _persist_to_brain(
+        content=content,
+        analysis=analysis,
+        short_reply=short_reply,
+        thread_tweets=thread_tweets,
+        infographic_prompt=infographic_prompt,
+        model_label=model_label,
+    )
 
     return OutputResult(
         model_label=model_label,

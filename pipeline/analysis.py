@@ -12,6 +12,7 @@ import logging
 import config
 import telemetry
 from llm.router import call_llm
+from pipeline.retrieval import fetch_prior_context
 from prompts.analysis import system_prompt, user_prompt
 
 log = logging.getLogger(__name__)
@@ -45,10 +46,13 @@ def run(content: str) -> tuple[str, str]:
     """
     log.info("Analysis pipeline start | content_len=%d", len(content))
 
+    with telemetry.timed(log, "Brain retrieval"):
+        prior_context = fetch_prior_context(content)
+
     with telemetry.timed(log, "Analysis pipeline"):
         model_label, analysis = call_llm(
             system=_build_system(),
-            user=user_prompt(content),
+            user=user_prompt(content, prior_context=prior_context),
             temperature=0.1,  # Deep analytical dive
         )
 
