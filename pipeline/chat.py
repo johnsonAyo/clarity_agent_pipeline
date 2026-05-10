@@ -90,8 +90,8 @@ def _run_loop(messages: list[dict]) -> str:
                 )
                 break # Success!
             except ollama_sdk.ResponseError as e:
-                if e.status_code == 429:
-                    log.warning("Chat quota hit for %s. Failing over...", model_name)
+                if e.status_code in [429, 404]:
+                    log.warning("Chat model %s unavailable (Status %d). Failing over...", model_name, e.status_code)
                     continue
                 if e.status_code == 403:
                     log.warning("Chat model %s requires subscription. Skipping...", model_name)

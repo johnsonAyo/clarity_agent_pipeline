@@ -63,8 +63,8 @@ def run(system: str, user: str, temperature: float = 0.3, think: bool = True) ->
                 )
                 break # Success! Break the model-tier loop
             except ollama_sdk.ResponseError as e:
-                if e.status_code == 429:
-                    log.warning("Quota hit for %s. Falling back...", model_name)
+                if e.status_code in [429, 404]:
+                    log.warning("Model %s unavailable (Status %d). Falling back...", model_name, e.status_code)
                     continue # Try the next model in the tier
                 if e.status_code == 403:
                     log.warning("Subscription required for %s. Skipping...", model_name)
