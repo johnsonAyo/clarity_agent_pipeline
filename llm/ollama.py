@@ -11,7 +11,6 @@ from __future__ import annotations
 import logging
 
 import ollama as ollama_sdk
-from ollama import web_fetch, web_search
 
 import config
 
@@ -41,27 +40,43 @@ def run(system: str, user: str, temperature: float = 0.3, think: bool = True) ->
     ]
     options = {"num_predict": 8192, "temperature": temperature, "num_ctx": 32768}
 
+    # Combine primary and fallbacks into a single try-list
+    model_tiers = [config.OLLAMA_CLOUD_MODEL] + config.OLLAMA_FALLBACK_TIERS
+    
     _MAX_STEPS = 15
-
     step = 0
+    
     while True:
         step += 1
         if step > _MAX_STEPS:
-            raise RuntimeError(f"Ollama loop exceeded {_MAX_STEPS} steps without completing — aborting")
+            raise RuntimeError(f"Ollama loop exceeded {_MAX_STEPS} steps without completing")
 
-        log.info("Ollama loop | step=%d/%d | model=%s | messages=%d | think=%s", step, _MAX_STEPS, config.OLLAMA_CLOUD_MODEL, len(messages), think)
+        response = None
+        for model_name in model_tiers:
+            try:
+                log.info("Ollama call | step=%d/%d | model=%s | think=%s", step, _MAX_STEPS, model_name, think)
+                response = client.chat(
+                    model=model_name,
+                    messages=messages,
+                    think=think,
+                    options=options,
+                )
+                break # Success! Break the model-tier loop
+            except ollama_sdk.ResponseError as e:
+                if e.status_code == 429:
+                    log.warning("Quota hit for %s. Falling back...", model_name)
+                    continue # Try the next model in the tier
+                if e.status_code == 403:
+                    log.warning("Subscription required for %s. Skipping...", model_name)
+                    continue
+                log.error("Ollama API error | step=%d | status=%d | %s", step, e.status_code, e)
+                raise
+            except Exception as exc:
+                log.error("Ollama transport error | step=%d | %s", step, exc)
+                raise
 
-        try:
-            response = client.chat(
-                model=config.OLLAMA_CLOUD_MODEL,
-                messages=messages,
-                tools=[web_search, web_fetch],
-                think=think,
-                options=options,
-            )
-        except Exception as exc:
-            log.error("Ollama chat call failed | step=%d | error=%s", step, exc, exc_info=True)
-            raise
+        if not response:
+            raise RuntimeError("All Ollama cloud tiers failed (all quotas exhausted).")
 
         if thinking := getattr(response.message, "thinking", ""):
             log.debug("Ollama thinking | step=%d | preview=%s...", step, thinking[:200])
@@ -82,8 +97,9 @@ def run(system: str, user: str, temperature: float = 0.3, think: bool = True) ->
             log.info("Tool dispatch | name=%s | args_preview=%s", name, str(args)[:150])
 
             try:
-                result_text = str(getattr(client, name)(**args))[:config.OLLAMA_MAX_TOOL_RESULT_CHARS]
-                log.info("Tool success | name=%s | result_len=%d", name, len(result_text))
+                raise ValueError(f"Unknown tool: {name}")
+                result_text = ""
+                log.info("Tool ok | name=%s | len=%d", name, len(result_text))
             except Exception as exc:
                 result_text = f"Tool '{name}' failed: {exc}"
                 log.error("Tool error | name=%s | error=%s", name, exc)

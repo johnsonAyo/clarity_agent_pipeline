@@ -42,8 +42,8 @@ CLAUDE_CLI_TIMEOUT = int(_optional("CLAUDE_CLI_TIMEOUT", "300"))
 
 # Ollama Cloud (primary provider — free tier supports light usage, resets every 5h)
 OLLAMA_API_KEY     = _optional("OLLAMA_API_KEY")
-OLLAMA_CLOUD_MODEL = _optional("OLLAMA_CLOUD_MODEL", "qwen3.5:35b")    # analysis + output
-OLLAMA_IMAGE_MODEL = _optional("OLLAMA_IMAGE_MODEL", "qwen3.5-vl:7b") # vision (not generation)
+OLLAMA_CLOUD_MODEL = _optional("OLLAMA_CLOUD_MODEL", "gemma4:31b")      # primary choice
+OLLAMA_FALLBACK_TIERS = ["gemma3:27b", "nemotron-3-super"]           # safety nets
 OLLAMA_MAX_TOOL_RESULT_CHARS = 8_000
 
 # Skills

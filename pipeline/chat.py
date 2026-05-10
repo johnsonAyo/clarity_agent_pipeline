@@ -24,7 +24,6 @@ import logging
 import os
 
 import ollama as ollama_sdk
-from ollama import web_fetch, web_search
 
 import config
 from brain import gbrain_cli
@@ -73,18 +72,37 @@ def _run_loop(messages: list[dict]) -> str:
     """Drives the Ollama agentic loop until the model returns a final reply."""
     client = _make_client()
     options = {"num_predict": 2048, "temperature": 0.4, "num_ctx": 32768}
-    tools = [web_search, web_fetch] + list(_CUSTOM_TOOLS.values())
+
+    # Combine primary chat model and safety tiers
+    model_tiers = [_CHAT_MODEL] + config.OLLAMA_FALLBACK_TIERS
 
     for step in range(1, _MAX_STEPS + 1):
-        log.info("Chat loop | step=%d/%d | model=%s | msgs=%d",
-                 step, _MAX_STEPS, _CHAT_MODEL, len(messages))
+        response = None
+        for model_name in model_tiers:
+            try:
+                log.info("Chat call | step=%d/%d | model=%s | msgs=%d",
+                         step, _MAX_STEPS, model_name, len(messages))
+                response = client.chat(
+                    model=model_name,
+                    messages=messages,
+                    tools=list(_CUSTOM_TOOLS.values()),
+                    options={"num_predict": 4096, "temperature": 0.4}
+                )
+                break # Success!
+            except ollama_sdk.ResponseError as e:
+                if e.status_code == 429:
+                    log.warning("Chat quota hit for %s. Failing over...", model_name)
+                    continue
+                if e.status_code == 403:
+                    log.warning("Chat model %s requires subscription. Skipping...", model_name)
+                    continue
+                raise
+            except Exception as exc:
+                log.error("Chat transport error | step=%d | %s", step, exc)
+                raise
 
-        response = client.chat(
-            model=_CHAT_MODEL,
-            messages=messages,
-            tools=tools,
-            options=options,
-        )
+        if not response:
+            raise RuntimeError("All chat model tiers failed (quota exhausted).")
         messages.append(response.message)
 
         if not response.message.tool_calls:
@@ -101,8 +119,7 @@ def _run_loop(messages: list[dict]) -> str:
                 if name in _CUSTOM_TOOLS:
                     result = _CUSTOM_TOOLS[name](**args)
                 else:
-                    # Ollama Cloud built-in (web_search / web_fetch)
-                    result = getattr(client, name)(**args)
+                    raise ValueError(f"Unknown tool: {name}")
                 result_text = str(result)[:config.OLLAMA_MAX_TOOL_RESULT_CHARS]
                 log.info("Tool ok | name=%s | len=%d", name, len(result_text))
             except Exception as exc:
