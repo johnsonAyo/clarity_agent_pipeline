@@ -7,7 +7,13 @@ The infographic prompt is ALWAYS returned as text, regardless of whether
 image generation succeeds. Image generation is best-effort.
 """
 
-from __future__ import annotations
+class OutputParseError(ValueError):
+    def __init__(self, missing_tags: list[str], raw_preview: str) -> None:
+        self.missing_tags = missing_tags
+        self.raw_preview = raw_preview
+        super().__init__(f"LLM output missing required tags: {missing_tags} | preview: {raw_preview[:200]}")
+
+
 
 import hashlib
 import logging
@@ -105,8 +111,8 @@ def _parse_output(raw: str) -> tuple[str, list[str], str]:
     infographic = _extract_tag(raw, "infographic_prompt")
 
     if not short_reply:
-        log.warning("short_reply tag not found — delivering full body as short reply")
-        short_reply = raw.strip()
+        raise OutputParseError(["short_reply"], raw[:200])
+
 
     if not thread_raw:
         log.warning("thread tag not found — no tweets extracted")

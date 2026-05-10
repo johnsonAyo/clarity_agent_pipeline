@@ -43,7 +43,10 @@ CLAUDE_CLI_TIMEOUT = int(_optional("CLAUDE_CLI_TIMEOUT", "300"))
 # Ollama Cloud (requires OLLAMA_API_KEY)
 OLLAMA_API_KEY = _optional("OLLAMA_API_KEY")
 
-# Ollama Cloud Model Tiers (Hardcoded sequence: Best -> Large -> Reliable)
+OLLAMA_CLOUD_MODEL = _optional(
+    "OLLAMA_CLOUD_MODEL",
+    "gemma4:31b"
+)
 OLLAMA_MODEL_TIERS = [
     "gemma4:31b",       # Tier 1: Frontier quality
     "gemma3:27b",       # Tier 2: High intelligence backup

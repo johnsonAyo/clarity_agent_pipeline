@@ -97,11 +97,14 @@ def run(system: str, user: str, temperature: float = 0.3, think: bool = True) ->
             log.info("Tool dispatch | name=%s | args_preview=%s", name, str(args)[:150])
 
             try:
-                raise ValueError(f"Unknown tool: {name}")
-                result_text = ""
-                log.info("Tool ok | name=%s | len=%d", name, len(result_text))
+                # Replace dead raise with graceful handling
+                result_text = f"Tool '{name}' is not implemented."
+                log.warning("Tool '%s' is not implemented.", name)
+                messages.append({"role": "tool", "content": result_text, "tool_name": name})
             except Exception as exc:
+                # Fallback if unexpected error
                 result_text = f"Tool '{name}' failed: {exc}"
                 log.error("Tool error | name=%s | error=%s", name, exc)
+                messages.append({"role": "tool", "content": result_text, "tool_name": name})
 
             messages.append({"role": "tool", "content": result_text, "tool_name": name})
