@@ -40,8 +40,8 @@ def run(system: str, user: str, temperature: float = 0.3, think: bool = True) ->
     ]
     options = {"num_predict": 8192, "temperature": temperature, "num_ctx": 32768}
 
-    # Combine primary and fallbacks into a single try-list
-    model_tiers = [config.OLLAMA_CLOUD_MODEL] + config.OLLAMA_FALLBACK_TIERS
+    # Use hardcoded tiers (Best -> Large -> Reliable)
+    model_tiers = config.OLLAMA_MODEL_TIERS
     
     _MAX_STEPS = 15
     step = 0

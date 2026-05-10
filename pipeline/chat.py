@@ -21,7 +21,6 @@ hermes3:latest; override with CHAT_MODEL env var.
 from __future__ import annotations
 
 import logging
-import os
 
 import ollama as ollama_sdk
 
@@ -34,13 +33,11 @@ log = logging.getLogger(__name__)
 _MAX_STEPS = 10
 _MAX_HISTORY_TURNS = 12
 
-_CHAT_MODEL = os.getenv("CHAT_MODEL", "hermes3:latest")
-
 
 # Tool registry. Functions Ollama can introspect for tool schema.
 
 def gbrain_query(question: str, limit: int = 5) -> str:
-    """Hybrid semantic + keyword search across the user's brain (notes, skills, projects, interview prep, clarity outputs, company pages). Use for natural-language questions like 'what did I write about X' or 'find notes related to Y'."""
+    """Hybrid semantic + keyword search across the user's brain (notes, skills, projects, interview prep, Mind Cache outputs, company pages). Use for natural-language questions like 'what did I write about X' or 'find notes related to Y'."""
     return gbrain_cli.query(question, limit=limit)
 
 
@@ -50,7 +47,7 @@ def gbrain_search(keyword: str, limit: int = 5) -> str:
 
 
 def gbrain_get(slug: str) -> str:
-    """Fetch the full contents of a brain page by its slug (e.g. 'companies/aveni' or 'projects/clarity-bot'). Use after gbrain_query/gbrain_search returns a slug worth reading in full."""
+    """Fetch the full contents of a brain page by its slug (e.g. 'companies/aveni' or 'projects/mind-cache'). Use after gbrain_query/gbrain_search returns a slug worth reading in full."""
     return gbrain_cli.get_page(slug)
 
 
@@ -73,8 +70,8 @@ def _run_loop(messages: list[dict]) -> str:
     client = _make_client()
     options = {"num_predict": 2048, "temperature": 0.4, "num_ctx": 32768}
 
-    # Combine primary chat model and safety tiers
-    model_tiers = [_CHAT_MODEL] + config.OLLAMA_FALLBACK_TIERS
+    # Use hardcoded tiers (Best -> Large -> Reliable)
+    model_tiers = config.OLLAMA_MODEL_TIERS
 
     for step in range(1, _MAX_STEPS + 1):
         response = None

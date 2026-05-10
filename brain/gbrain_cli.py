@@ -55,7 +55,7 @@ def search(keyword: str, limit: int = 5) -> str:
 
 
 def get_page(slug: str) -> str:
-    """Fetch a full brain page by slug (e.g. 'Projects/clarity-bot')."""
+    """Fetch a full brain page by slug (e.g. 'Projects/mind-cache')."""
     return _run(["get", slug])
 
 

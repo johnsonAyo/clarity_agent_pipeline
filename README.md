@@ -1,6 +1,6 @@
-# 🛸 Clarity Bot — Context Completion Agent
+# 🛸 Mind Cache — Context Completion Agent
 
-Clarity Bot is an agentic AI pipeline designed to debunk viral misinformation and add the "missing context" to social media posts. It uses a tiered LLM routing system (Claude 4.7 & Qwen-3.5) with integrated web research and automated image generation.
+Mind Cache is an agentic AI pipeline designed to debunk viral misinformation and add the "missing context" to social media posts. It uses a tiered LLM routing system (Claude 4.7 & Qwen-3.5) with integrated web research and automated image generation.
 
 ---
 
@@ -9,7 +9,7 @@ Clarity Bot is an agentic AI pipeline designed to debunk viral misinformation an
 The project is structured for production-grade reliability and modularity:
 
 ```text
-clarity_bot_pipeline/
+mind_cache_pipeline/
 ├── bot/                # Telegram interaction layer
 │   ├── handlers.py     # State machine & command logic
 │   └── messenger.py    # Robust HTML delivery & photo handling
@@ -37,7 +37,7 @@ clarity_bot_pipeline/
 ### 2. Installation
 ```bash
 git clone <your-repo-url>
-cd clarity_bot_pipeline
+cd mind_cache_pipeline
 pip install -r requirements.txt
 ```
 
@@ -74,7 +74,7 @@ pm2 start ecosystem.config.js
 
 ---
 
-## 🧠 The "Clarity" Workflow
+## 🧠 The "Mind Cache" Workflow
 
 1. **Content Accumulation**: Paste any article or tweet into the Input Bot. You can send multiple chunks.
 2. **Analysis (/go)**:
@@ -92,5 +92,5 @@ pm2 start ecosystem.config.js
 ## 🛡 Production Features
 - **State Persistence**: Recovers from crashes automatically.
 - **HTML Safety**: Automatically splits and cleans long messages for Telegram.
-- **Image Overwrite**: Keeps disk usage low by overwriting the `/tmp/clarity_infographic.png` scratchpad.
+- **Image Overwrite**: Keeps disk usage low by overwriting the `/tmp/mind_cache_infographic.png` scratchpad.
 - **Tiered Routing**: Seamlessly fails over from Claude to Ollama if quotas are hit.

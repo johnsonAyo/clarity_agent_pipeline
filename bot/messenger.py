@@ -103,7 +103,7 @@ def send_to_output(text: str) -> None:
     _send_text(_output_bot, config.TELEGRAM_CHAT_ID, text)
 
 
-def send_photo_to_output(image_path: Path, caption: str = "Clarity Infographic") -> bool:
+def send_photo_to_output(image_path: Path, caption: str = "Mind Cache Infographic") -> bool:
     """
     Delivers an image to the output bot channel.
     Returns True on success, False on failure (caller should log accordingly).

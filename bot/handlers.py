@@ -114,10 +114,10 @@ def cmd_save(update: Update, context: CallbackContext) -> None:
 
     digest = hashlib.sha1(content.encode("utf-8")).hexdigest()[:8]
     today  = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    slug   = f"clarity/bookmarks/{today}-{digest}"
+    slug   = f"mindcache/bookmarks/{today}-{digest}"
 
     frontmatter = {
-        "type": "clarity-bookmark",
+        "type": "mindcache-bookmark",
         "saved_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "saved_by": str(update.effective_user.id),
         "char_count": len(content),
@@ -192,7 +192,7 @@ def cmd_endchat(update: Update, context: CallbackContext) -> None:
     """
     context.user_data.pop("state", None)
     context.user_data.pop("chat_history", None)
-    update.message.reply_text("Chat mode off. Back to clarity workflow.")
+    update.message.reply_text("Chat mode off. Back to Mind Cache workflow.")
     log.info("Chat mode exited | user=%s", update.effective_user.id)
 
 
@@ -309,5 +309,5 @@ def _generate_and_deliver(update: Update, context: CallbackContext) -> None:
         if not sent:
             log.warning("Image file exists but Telegram photo send failed | path=%s", result.image_path)
 
-    update.message.reply_text("Outputs delivered to Clarity Output bot.")
+    update.message.reply_text("Outputs delivered to Mind Cache Output bot.")
     context.user_data.clear()

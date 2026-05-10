@@ -18,7 +18,6 @@ from pathlib import Path
 
 import telemetry
 from brain import gbrain_cli
-from llm.images import generate_image
 from llm.router import call_llm
 from prompts.output import system_prompt, user_prompt
 
@@ -29,7 +28,7 @@ def _writeback_slug(content: str) -> str:
     """Stable slug from content hash, prefixed with the UTC date for chronological listing."""
     digest = hashlib.sha1(content.strip().encode("utf-8")).hexdigest()[:8]
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    return f"clarity/analyses/{today}-{digest}"
+    return f"mindcache/analyses/{today}-{digest}"
 
 
 def _writeback_body(
@@ -70,7 +69,7 @@ def _persist_to_brain(
     try:
         slug = _writeback_slug(content)
         frontmatter = {
-            "type": "clarity-analysis",
+            "type": "mindcache-analysis",
             "model": model_label,
             "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "content_preview": content.strip().replace("\n", " ")[:140],
@@ -150,14 +149,8 @@ def run(content: str, analysis: str) -> OutputResult:
         model_label, len(short_reply), len(thread_tweets),
     )
 
-    image_path: Path | None = None
-    if infographic_prompt:
-        with telemetry.timed(log, "Image generation"):
-            image_path, image_reason = generate_image(infographic_prompt)
-        if image_path:
-            log.info("Image generation succeeded | path=%s", image_path)
-        else:
-            log.warning("Image generation failed | reason=%s", image_reason)
+    # Image generation removed - use Hermes Agent for visual tasks
+    image_path = None
 
     _persist_to_brain(
         content=content,

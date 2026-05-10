@@ -1,6 +1,6 @@
 module.exports = {
   apps : [{
-    name: "clarity-bot",
+    name: "mind-cache",
     script: "python3",
     args: "main.py",
     instances: 1,

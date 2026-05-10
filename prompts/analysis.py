@@ -2,14 +2,14 @@
 prompts/analysis.py
 ===================
 Prompts for the analysis phase.
-The system prompt defines the Clarity Agent's analytical role.
+The system prompt defines the Mind Cache Agent's analytical role.
 The user prompt structures the investigation.
 """
 
 
 def system_prompt() -> str:
     return (
-        "You are the Clarity Agent. You read viral posts the way someone reads a contract from a party "
+        "You are the Mind Cache Agent. You read viral posts the way someone reads a contract from a party "
         "that benefits from you not reading it carefully.\n\n"
         "Your first question is always: what is this post hoping you don't Google?\n"
         "Viral posts rarely lie outright. They win by controlling what you focus on. "

@@ -1,7 +1,7 @@
 """
 pipeline/analysis.py
 ====================
-Analysis stage: takes raw post content, runs the Clarity Agent analysis,
+Analysis stage: takes raw post content, runs the Mind Cache Agent analysis,
 returns (model_label, analysis_text).
 """
 
@@ -19,11 +19,11 @@ log = logging.getLogger(__name__)
 
 # Load skill file once at import time — fail with warning, not crash
 _skill_instructions: str = ""
-if config.CLARITY_SKILL_PATH.exists():
-    _skill_instructions = config.CLARITY_SKILL_PATH.read_text(encoding="utf-8")
-    log.info("Clarity skill loaded | path=%s | len=%d", config.CLARITY_SKILL_PATH, len(_skill_instructions))
+if config.MIND_CACHE_SKILL_PATH.exists():
+    _skill_instructions = config.MIND_CACHE_SKILL_PATH.read_text(encoding="utf-8")
+    log.info("Mind Cache skill loaded | path=%s | len=%d", config.MIND_CACHE_SKILL_PATH, len(_skill_instructions))
 else:
-    log.warning("Clarity skill file not found | path=%s | proceeding without it", config.CLARITY_SKILL_PATH)
+    log.warning("Mind Cache skill file not found | path=%s | proceeding without it", config.MIND_CACHE_SKILL_PATH)
 
 
 def _build_system() -> str:

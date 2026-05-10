@@ -40,14 +40,19 @@ CLAUDE_CLI_PATH  = shutil.which(_cli_path_env) or _cli_path_env
 CLAUDE_CLI_MODEL = _optional("CLAUDE_CLI_MODEL", "claude-opus-4-7")
 CLAUDE_CLI_TIMEOUT = int(_optional("CLAUDE_CLI_TIMEOUT", "300"))
 
-# Ollama Cloud (primary provider — free tier supports light usage, resets every 5h)
-OLLAMA_API_KEY     = _optional("OLLAMA_API_KEY")
-OLLAMA_CLOUD_MODEL = _optional("OLLAMA_CLOUD_MODEL", "gemma4:31b")      # primary choice
-OLLAMA_FALLBACK_TIERS = ["gemma3:27b", "nemotron-3-super"]           # safety nets
+# Ollama Cloud (requires OLLAMA_API_KEY)
+OLLAMA_API_KEY = _optional("OLLAMA_API_KEY")
+
+# Ollama Cloud Model Tiers (Hardcoded sequence: Best -> Large -> Reliable)
+OLLAMA_MODEL_TIERS = [
+    "gemma4:31b",       # Tier 1: Frontier quality
+    "gemma3:27b",       # Tier 2: High intelligence backup
+    "nemotron-3-super"  # Tier 3: Infinite safety net (always available)
+]
 OLLAMA_MAX_TOOL_RESULT_CHARS = 8_000
 
 # Skills
-CLARITY_SKILL_PATH = BASE_DIR / "skills" / "clarity-bot" / "SKILL.md"
+MIND_CACHE_SKILL_PATH = BASE_DIR / "skills" / "mind-cache" / "SKILL.md"
 
 # Image generation - Hugging Face (primary, free)
 HF_API_TOKEN      = _optional("HF_API_TOKEN")
@@ -58,5 +63,5 @@ OPENAI_API_KEY     = _optional("OPENAI_API_KEY")
 OPENAI_IMAGE_MODEL = _optional("OPENAI_IMAGE_MODEL", "gpt-image-1")
 
 # Output paths
-IMAGE_OUTPUT_PATH = Path("/tmp/clarity_infographic.png")
+IMAGE_OUTPUT_PATH = Path("/tmp/mind_cache_infographic.png")
 LOG_PATH          = BASE_DIR / "bot.log"

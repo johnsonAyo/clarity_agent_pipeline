@@ -1,7 +1,7 @@
 """
 telemetry.py
 ============
-Logging setup for the Clarity Bot.
+Logging setup for Mind Cache.
 - Rotating file log (5 MB × 3 backups) + stdout stream.
 - Timed context manager for measuring pipeline stages.
 - Quiet noisy third-party libraries.
